@@ -5,7 +5,10 @@ import android.content.ClipDescription;
 import android.content.ClipboardManager;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.inputmethodservice.InputMethodService;
 import android.net.Uri;
 import android.os.Handler;
@@ -16,6 +19,12 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.SeekBar;
+import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.core.content.FileProvider;
 import androidx.core.view.inputmethod.EditorInfoCompat;
@@ -37,6 +46,18 @@ public class DirectWritingIME extends InputMethodService {
     private static final long BACKSPACE_INITIAL_REPEAT_DELAY_MS = 350L;
     private static final long BACKSPACE_REPEAT_INTERVAL_MS = 60L;
     private static final int CLIPBOARD_PREVIEW_MAX = 20;
+    private static final float HISTORY_BUTTON_ENABLED_ALPHA = 1f;
+    private static final float HISTORY_BUTTON_DISABLED_ALPHA = 0.45f;
+    private static final int[] PEN_COLOR_PALETTE = new int[]{
+            0xFF111111,
+            0xFFF44336,
+            0xFFFF9800,
+            0xFFFDD835,
+            0xFF26A69A,
+            0xFF1E88E5,
+            0xFF3949AB,
+            0xFF8E24AA
+    };
     private static final int[] ALPHA_KEY_IDS = new int[]{R.id.key_q, R.id.key_w, R.id.key_e, R.id.key_r, R.id.key_t, R.id.key_y, R.id.key_u, R.id.key_i, R.id.key_o, R.id.key_p, R.id.key_a, R.id.key_s, R.id.key_d, R.id.key_f, R.id.key_g, R.id.key_h, R.id.key_j, R.id.key_k, R.id.key_l, R.id.key_z, R.id.key_x, R.id.key_c, R.id.key_v, R.id.key_b, R.id.key_n, R.id.key_m};
     private static final String[] ALPHA_KEY_CODES = new String[]{"q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "a", "s", "d", "f", "g", "h", "j", "k", "l", "z", "x", "c", "v", "b", "n", "m"};
     private static final int[] NUMBER_KEY_IDS = new int[]{R.id.key_num_1, R.id.key_num_2, R.id.key_num_3, R.id.key_num_4, R.id.key_num_5, R.id.key_num_6, R.id.key_num_7, R.id.key_num_8, R.id.key_num_9, R.id.key_num_0};
@@ -48,6 +69,7 @@ public class DirectWritingIME extends InputMethodService {
     private final KeyboardStateMachine stateMachine = new KeyboardStateMachine();
     private final HangulComposer hangulComposer = new HangulComposerImpl();
     private final Map<String, Button> alphaKeyButtons = new HashMap<String, Button>();
+    private final View[] colorChipViews = new View[PEN_COLOR_PALETTE.length];
     private final Runnable backspaceRepeatRunnable = new Runnable() {
 
         @Override
@@ -66,13 +88,35 @@ public class DirectWritingIME extends InputMethodService {
     private View keyboardRow2;
     private View keyboardRow3;
     private View keyboardRow4;
+    private View keyboardNumberRowSplitGap;
+    private View keyboardRow1SplitGap;
+    private View keyboardRow2SplitGap;
+    private View keyboardRow3SplitGap;
+    private View keyboardRow4SplitGap;
     private Button btnModeToggle;
     private Button btnModeToggleHandwriting;
+    private Button btnPenTool;
+    private Button btnEraserTool;
+    private View btnUndo;
+    private View btnRedo;
     private Button keyClipboardChip;
     private Button keyShift;
     private Button keyLayoutToggle;
     private Button keyLanguageToggle;
+    private Button keySpace;
+    private Button keySpaceRight;
     private Button keyEnter;
+    private View handwritingToolSettingsPanel;
+    private View penSettingsPanel;
+    private View eraserSettingsPanel;
+    private SeekBar seekPenThickness;
+    private TextView tvPenThicknessValue;
+    private Switch switchPenPressure;
+    private RadioGroup groupEraserMode;
+    private RadioButton radioEraserStroke;
+    private RadioButton radioEraserArea;
+    private SeekBar seekEraserSize;
+    private TextView tvEraserSizeValue;
     private CanvasView canvasView;
     private int baseQuickBarHeightPx;
     private int baseNumberRowHeightPx;
@@ -86,7 +130,17 @@ public class DirectWritingIME extends InputMethodService {
     private KeyboardHeightCalculator.BaseHeights keyboardBaseHeights;
     private boolean targetSupportsImage = false;
     private boolean backspaceRepeated = false;
+    private boolean suppressHandwritingControlCallbacks = false;
+    private boolean handwritingSettingsExpanded = false;
     private String enterKeyLabel = "";
+    private CanvasView.ToolType selectedHandwritingTool = CanvasView.ToolType.PEN;
+
+    private enum HandwritingSettingsPanelType {
+        PEN,
+        ERASER
+    }
+
+    private HandwritingSettingsPanelType activeHandwritingSettingsPanel = HandwritingSettingsPanelType.PEN;
 
     public View onCreateInputView() {
         View root = this.getLayoutInflater().inflate(R.layout.keyboard_layout, null);
@@ -97,30 +151,69 @@ public class DirectWritingIME extends InputMethodService {
         this.keyboardRow2 = root.findViewById(R.id.keyboard_row_2);
         this.keyboardRow3 = root.findViewById(R.id.keyboard_row_3);
         this.keyboardRow4 = root.findViewById(R.id.keyboard_row_4);
+        this.keyboardNumberRowSplitGap = root.findViewById(R.id.keyboard_number_row_split_gap);
+        this.keyboardRow1SplitGap = root.findViewById(R.id.keyboard_row_1_split_gap);
+        this.keyboardRow2SplitGap = root.findViewById(R.id.keyboard_row_2_split_gap);
+        this.keyboardRow3SplitGap = root.findViewById(R.id.keyboard_row_3_split_gap);
+        this.keyboardRow4SplitGap = root.findViewById(R.id.keyboard_row_4_split_gap);
         this.keyboardPanel = root.findViewById(R.id.panel_keyboard);
         this.handwritingPanel = root.findViewById(R.id.panel_handwriting);
         this.btnModeToggle = (Button) root.findViewById(R.id.btn_mode_toggle);
         this.btnModeToggleHandwriting = (Button) root.findViewById(R.id.btn_mode_toggle_handwriting);
+        this.btnPenTool = (Button) root.findViewById(R.id.btn_pen_tool);
+        this.btnEraserTool = (Button) root.findViewById(R.id.btn_eraser_tool);
+        this.btnUndo = root.findViewById(R.id.btn_undo);
+        this.btnRedo = root.findViewById(R.id.btn_redo);
         this.keyClipboardChip = (Button) root.findViewById(R.id.key_clipboard_chip);
         this.keyShift = (Button) root.findViewById(R.id.key_shift);
         this.keyLayoutToggle = (Button) root.findViewById(R.id.key_layout_toggle);
         this.keyLanguageToggle = (Button) root.findViewById(R.id.key_language_toggle);
+        this.keySpace = (Button) root.findViewById(R.id.key_space);
+        this.keySpaceRight = (Button) root.findViewById(R.id.key_space_right);
         this.keyEnter = (Button) root.findViewById(R.id.key_enter);
         this.canvasView = (CanvasView) root.findViewById(R.id.canvas_view);
+        this.handwritingToolSettingsPanel = root.findViewById(R.id.handwriting_tool_settings_panel);
+        this.penSettingsPanel = root.findViewById(R.id.panel_pen_settings);
+        this.eraserSettingsPanel = root.findViewById(R.id.panel_eraser_settings);
+        this.seekPenThickness = (SeekBar) root.findViewById(R.id.seek_pen_thickness);
+        this.tvPenThicknessValue = (TextView) root.findViewById(R.id.tv_pen_thickness_value);
+        this.switchPenPressure = (Switch) root.findViewById(R.id.switch_pen_pressure);
+        this.groupEraserMode = (RadioGroup) root.findViewById(R.id.group_eraser_mode);
+        this.radioEraserStroke = (RadioButton) root.findViewById(R.id.radio_eraser_stroke);
+        this.radioEraserArea = (RadioButton) root.findViewById(R.id.radio_eraser_area);
+        this.seekEraserSize = (SeekBar) root.findViewById(R.id.seek_eraser_size);
+        this.tvEraserSizeValue = (TextView) root.findViewById(R.id.tv_eraser_size_value);
+        if (this.canvasView != null) {
+            this.canvasView.setOnHistoryStateChangedListener(this::renderHandwritingHistoryButtons);
+        }
+        this.enforceTabletExtractUiPolicy();
         this.initKeyboardHeightConfig();
         this.bindAlphaKeys(root);
         this.bindActionKeys(root);
+        this.bindHandwritingSettingsControls(root);
         this.applyCanvasPreferences();
         this.updateEnterKeyLabel(this.getCurrentInputEditorInfo());
         this.renderUi();
         return root;
     }
 
+    @Override
+    public boolean onEvaluateFullscreenMode() {
+        if (this.shouldDisableExtractUi()) {
+            return false;
+        }
+        return super.onEvaluateFullscreenMode();
+    }
+
     public void onStartInputView(EditorInfo editorInfo, boolean restarting) {
         super.onStartInputView(editorInfo, restarting);
+        this.enforceTabletExtractUiPolicy();
         this.updateTargetImageSupport(editorInfo);
         this.stateMachine.resetForNewInput();
         this.hangulComposer.flushComposing();
+        this.selectedHandwritingTool = CanvasView.ToolType.PEN;
+        this.activeHandwritingSettingsPanel = HandwritingSettingsPanelType.PEN;
+        this.handwritingSettingsExpanded = false;
         if (this.canvasView != null && !restarting) {
             this.canvasView.clearCanvas();
         }
@@ -157,6 +250,7 @@ public class DirectWritingIME extends InputMethodService {
                 R.id.key_layout_toggle,
                 R.id.key_language_toggle,
                 R.id.key_space,
+                R.id.key_space_right,
                 R.id.key_enter,
                 R.id.key_comma,
                 R.id.key_period,
@@ -167,7 +261,10 @@ public class DirectWritingIME extends InputMethodService {
                 R.id.key_quickbar_close,
                 R.id.btn_send,
                 R.id.btn_clear,
-                R.id.btn_undo
+                R.id.btn_undo,
+                R.id.btn_redo,
+                R.id.btn_pen_tool,
+                R.id.btn_eraser_tool
         };
 
         for (int id : clickKeys) {
@@ -188,6 +285,220 @@ public class DirectWritingIME extends InputMethodService {
         if (backspace != null) {
             backspace.setOnTouchListener(this::onBackspaceTouch);
         }
+    }
+
+    private void bindHandwritingSettingsControls(View root) {
+        int[] colorChipIds = new int[]{
+                R.id.color_chip_0,
+                R.id.color_chip_1,
+                R.id.color_chip_2,
+                R.id.color_chip_3,
+                R.id.color_chip_4,
+                R.id.color_chip_5,
+                R.id.color_chip_6,
+                R.id.color_chip_7
+        };
+
+        for (int i = 0; i < colorChipIds.length; ++i) {
+            View chip = root.findViewById(colorChipIds[i]);
+            this.colorChipViews[i] = chip;
+            if (chip == null) {
+                continue;
+            }
+            final int index = i;
+            chip.setClickable(true);
+            chip.setOnClickListener(v -> {
+                int color = PEN_COLOR_PALETTE[index];
+                ImePreferences.setPenColor((Context)this, color);
+                if (this.canvasView != null) {
+                    this.canvasView.setStrokeColor(color);
+                }
+                this.updateColorChipSelection(color);
+                this.selectedHandwritingTool = CanvasView.ToolType.PEN;
+                this.renderHandwritingToolsUi();
+            });
+        }
+
+        if (this.seekPenThickness != null) {
+            this.seekPenThickness.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    if (DirectWritingIME.this.suppressHandwritingControlCallbacks) {
+                        return;
+                    }
+                    int value = ImePreferences.clampPenThickness(progress + ImePreferences.MIN_PEN_THICKNESS);
+                    int normalizedProgress = value - ImePreferences.MIN_PEN_THICKNESS;
+                    if (progress != normalizedProgress) {
+                        seekBar.setProgress(normalizedProgress);
+                        return;
+                    }
+                    if (DirectWritingIME.this.tvPenThicknessValue != null) {
+                        DirectWritingIME.this.tvPenThicknessValue.setText(String.valueOf(value));
+                    }
+                    ImePreferences.setPenThickness((Context)DirectWritingIME.this, value);
+                    if (DirectWritingIME.this.canvasView != null) {
+                        DirectWritingIME.this.canvasView.setBaseStrokeWidth(value);
+                    }
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                }
+            });
+        }
+
+        if (this.switchPenPressure != null) {
+            this.switchPenPressure.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (this.suppressHandwritingControlCallbacks) {
+                    return;
+                }
+                ImePreferences.setPressureSensitivityEnabled((Context)this, isChecked);
+                if (this.canvasView != null) {
+                    this.canvasView.setPressureSensitive(isChecked);
+                }
+            });
+        }
+
+        if (this.groupEraserMode != null) {
+            this.groupEraserMode.setOnCheckedChangeListener((group, checkedId) -> {
+                if (this.suppressHandwritingControlCallbacks) {
+                    return;
+                }
+                if (checkedId != R.id.radio_eraser_stroke && checkedId != R.id.radio_eraser_area) {
+                    return;
+                }
+                int mode = checkedId == R.id.radio_eraser_area
+                        ? ImePreferences.ERASER_MODE_AREA
+                        : ImePreferences.ERASER_MODE_STROKE;
+                ImePreferences.setEraserMode((Context)this, mode);
+                if (this.canvasView != null) {
+                    this.canvasView.setEraserMode(this.toCanvasEraserMode(mode));
+                }
+            });
+        }
+
+        if (this.seekEraserSize != null) {
+            this.seekEraserSize.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    if (DirectWritingIME.this.suppressHandwritingControlCallbacks) {
+                        return;
+                    }
+                    int value = ImePreferences.clampEraserSize(progress + ImePreferences.MIN_ERASER_SIZE);
+                    int normalizedProgress = value - ImePreferences.MIN_ERASER_SIZE;
+                    if (progress != normalizedProgress) {
+                        seekBar.setProgress(normalizedProgress);
+                        return;
+                    }
+                    if (DirectWritingIME.this.tvEraserSizeValue != null) {
+                        DirectWritingIME.this.tvEraserSizeValue.setText(
+                                DirectWritingIME.this.getString(R.string.handwriting_px_value, value)
+                        );
+                    }
+                    ImePreferences.setEraserSize((Context)DirectWritingIME.this, value);
+                    if (DirectWritingIME.this.canvasView != null) {
+                        DirectWritingIME.this.canvasView.setEraserSizePx(value);
+                    }
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                }
+            });
+        }
+    }
+
+    private void renderHandwritingToolsUi() {
+        if (this.canvasView != null) {
+            this.canvasView.setToolType(this.selectedHandwritingTool);
+        }
+
+        int inactiveTextColor = this.getColor(R.color.key_text);
+        int activeTextColor = Color.WHITE;
+        if (this.btnPenTool != null) {
+            boolean selected = this.selectedHandwritingTool == CanvasView.ToolType.PEN;
+            this.btnPenTool.setSelected(selected);
+            this.btnPenTool.setTextColor(selected ? activeTextColor : inactiveTextColor);
+        }
+        if (this.btnEraserTool != null) {
+            boolean selected = this.selectedHandwritingTool == CanvasView.ToolType.ERASER;
+            this.btnEraserTool.setSelected(selected);
+            this.btnEraserTool.setTextColor(selected ? activeTextColor : inactiveTextColor);
+        }
+        if (this.handwritingToolSettingsPanel != null) {
+            this.handwritingToolSettingsPanel.setVisibility(this.handwritingSettingsExpanded ? View.VISIBLE : View.GONE);
+        }
+        if (this.penSettingsPanel != null) {
+            boolean visible = this.handwritingSettingsExpanded
+                    && this.activeHandwritingSettingsPanel == HandwritingSettingsPanelType.PEN;
+            this.penSettingsPanel.setVisibility(visible ? View.VISIBLE : View.GONE);
+        }
+        if (this.eraserSettingsPanel != null) {
+            boolean visible = this.handwritingSettingsExpanded
+                    && this.activeHandwritingSettingsPanel == HandwritingSettingsPanelType.ERASER;
+            this.eraserSettingsPanel.setVisibility(visible ? View.VISIBLE : View.GONE);
+        }
+        if (this.canvasView != null) {
+            this.renderHandwritingHistoryButtons(this.canvasView.canUndo(), this.canvasView.canRedo());
+        } else {
+            this.renderHandwritingHistoryButtons(false, false);
+        }
+    }
+
+    private void renderHandwritingHistoryButtons(boolean canUndo, boolean canRedo) {
+        this.updateHandwritingHistoryButtonState(this.btnUndo, canUndo);
+        this.updateHandwritingHistoryButtonState(this.btnRedo, canRedo);
+    }
+
+    private void updateHandwritingHistoryButtonState(View button, boolean enabled) {
+        if (button == null) {
+            return;
+        }
+        button.setEnabled(enabled);
+        button.setAlpha(enabled ? HISTORY_BUTTON_ENABLED_ALPHA : HISTORY_BUTTON_DISABLED_ALPHA);
+    }
+
+    private void updateColorChipSelection(int selectedColor) {
+        for (int i = 0; i < PEN_COLOR_PALETTE.length; ++i) {
+            View chip = this.colorChipViews[i];
+            if (chip == null) {
+                continue;
+            }
+            chip.setBackground(this.buildColorChipDrawable(PEN_COLOR_PALETTE[i], selectedColor == PEN_COLOR_PALETTE[i]));
+        }
+    }
+
+    private GradientDrawable buildColorChipDrawable(int color, boolean selected) {
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setShape(GradientDrawable.OVAL);
+        drawable.setColor(color);
+        int strokeColor = selected ? this.getColor(R.color.key_enter_background) : this.getColor(R.color.key_border);
+        int strokeWidthPx = selected ? 4 : 2;
+        drawable.setStroke(strokeWidthPx, strokeColor);
+        return drawable;
+    }
+
+    private int normalizePaletteColor(int color) {
+        for (int paletteColor : PEN_COLOR_PALETTE) {
+            if (paletteColor == color) {
+                return color;
+            }
+        }
+        return PEN_COLOR_PALETTE[0];
+    }
+
+    private CanvasView.EraserMode toCanvasEraserMode(int preferenceMode) {
+        return preferenceMode == ImePreferences.ERASER_MODE_AREA
+                ? CanvasView.EraserMode.AREA
+                : CanvasView.EraserMode.STROKE;
     }
 
     private void onKeyClicked(View view) {
@@ -251,12 +562,25 @@ public class DirectWritingIME extends InputMethodService {
             }
             case CLEAR_HANDWRITING: {
                 if (this.canvasView == null) break;
-                this.canvasView.clearCanvas();
+                this.canvasView.clearCanvasUndoable();
                 break;
             }
             case UNDO_HANDWRITING: {
                 if (this.canvasView == null) break;
                 this.canvasView.undoLastStroke();
+                break;
+            }
+            case REDO_HANDWRITING: {
+                if (this.canvasView == null) break;
+                this.canvasView.redoLastStroke();
+                break;
+            }
+            case PEN_TOOL: {
+                this.handlePenToolButton();
+                break;
+            }
+            case ERASER_TOOL: {
+                this.handleEraserToolButton();
                 break;
             }
         }
@@ -270,7 +594,7 @@ public class DirectWritingIME extends InputMethodService {
         if (action == 0) {
             this.stopBackspaceRepeat();
             this.backspaceRepeated = false;
-            this.mainHandler.postDelayed(this.backspaceRepeatRunnable, 350L);
+            this.mainHandler.postDelayed(this.backspaceRepeatRunnable, BACKSPACE_INITIAL_REPEAT_DELAY_MS);
             return true;
         }
         if (action == 1 || action == 3) {
@@ -418,6 +742,37 @@ public class DirectWritingIME extends InputMethodService {
         this.renderUi();
     }
 
+    private void handlePenToolButton() {
+        if (this.stateMachine.getMode() != KeyboardState.Mode.HANDWRITING) {
+            return;
+        }
+        this.selectedHandwritingTool = CanvasView.ToolType.PEN;
+        this.toggleHandwritingSettingsPanel(HandwritingSettingsPanelType.PEN);
+        this.renderUi();
+    }
+
+    private void handleEraserToolButton() {
+        if (this.stateMachine.getMode() != KeyboardState.Mode.HANDWRITING) {
+            return;
+        }
+        this.selectedHandwritingTool = CanvasView.ToolType.ERASER;
+        if (this.canvasView != null) {
+            int mode = ImePreferences.getEraserMode((Context)this);
+            this.canvasView.setEraserMode(this.toCanvasEraserMode(mode));
+        }
+        this.toggleHandwritingSettingsPanel(HandwritingSettingsPanelType.ERASER);
+        this.renderUi();
+    }
+
+    private void toggleHandwritingSettingsPanel(HandwritingSettingsPanelType panelType) {
+        if (this.handwritingSettingsExpanded && this.activeHandwritingSettingsPanel == panelType) {
+            this.handwritingSettingsExpanded = false;
+            return;
+        }
+        this.handwritingSettingsExpanded = true;
+        this.activeHandwritingSettingsPanel = panelType;
+    }
+
     private void handleQuickBarClose() {
         if (this.stateMachine.getMode() != KeyboardState.Mode.KEYBOARD) {
             return;
@@ -522,11 +877,18 @@ public class DirectWritingIME extends InputMethodService {
             if (this.keyboardNumberRow != null) {
                 this.keyboardNumberRow.setVisibility(this.stateMachine.isNumberRowVisible() ? View.VISIBLE : View.GONE);
             }
+            this.handwritingSettingsExpanded = false;
+            if (this.handwritingToolSettingsPanel != null) {
+                this.handwritingToolSettingsPanel.setVisibility(View.GONE);
+            }
             this.applyScaledKeyboardHeight();
+            this.applyTabletSplitLayout();
             this.renderKeyboardLabels();
             this.updateClipboardChipLabel();
         } else {
             this.applyBaseKeyboardHeight();
+            this.applyTabletSplitLayout();
+            this.renderHandwritingToolsUi();
         }
     }
 
@@ -555,7 +917,8 @@ public class DirectWritingIME extends InputMethodService {
             return;
         }
         int screenHeightPx = this.getResources().getDisplayMetrics().heightPixels;
-        boolean isPortrait = this.getResources().getConfiguration().orientation != 2;
+        boolean isPortrait =
+                this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE;
         KeyboardHeightCalculator.Result result = KeyboardHeightCalculator.calculate(
                 screenHeightPx,
                 isPortrait,
@@ -591,6 +954,93 @@ public class DirectWritingIME extends InputMethodService {
         }
     }
 
+    private boolean shouldDisableExtractUi() {
+        Configuration configuration = this.getResources().getConfiguration();
+        return ImeWindowModeResolver.shouldDisableExtractUi(configuration.smallestScreenWidthDp);
+    }
+
+    private boolean shouldUseTabletSplitLayout() {
+        Configuration configuration = this.getResources().getConfiguration();
+        return ImeWindowModeResolver.shouldUseSplitLayout(
+                configuration.smallestScreenWidthDp,
+                configuration.orientation
+        );
+    }
+
+    private void enforceTabletExtractUiPolicy() {
+        if (this.shouldDisableExtractUi()) {
+            this.setExtractViewShown(false);
+        }
+    }
+
+    private void applyTabletSplitLayout() {
+        boolean splitEnabled = this.shouldUseTabletSplitLayout();
+        this.applySplitSpacer(this.keyboardNumberRowSplitGap, this.keyboardNumberRow, splitEnabled);
+        this.applySplitSpacer(this.keyboardRow1SplitGap, this.keyboardRow1, splitEnabled);
+        this.applySplitSpacer(this.keyboardRow2SplitGap, this.keyboardRow2, splitEnabled);
+        this.applySplitSpacer(this.keyboardRow3SplitGap, this.keyboardRow3, splitEnabled);
+        this.applySplitSpacer(this.keyboardRow4SplitGap, this.keyboardRow4, splitEnabled);
+        this.updateSplitSpaceKeys(splitEnabled);
+
+        if (splitEnabled && this.keyboardPanel != null && this.keyboardPanel.getWidth() == 0) {
+            this.keyboardPanel.post(this::applyTabletSplitLayout);
+        }
+    }
+
+    private void applySplitSpacer(View spacer, View row, boolean splitEnabled) {
+        if (spacer == null) {
+            return;
+        }
+        if (!splitEnabled) {
+            spacer.setVisibility(View.GONE);
+            this.setViewWidth(spacer, 0);
+            return;
+        }
+        int rowContentWidthPx = this.resolveRowContentWidth(row);
+        int gapWidthPx = ImeWindowModeResolver.resolveSplitGapWidthPx(rowContentWidthPx);
+        this.setViewWidth(spacer, gapWidthPx);
+        spacer.setVisibility(View.VISIBLE);
+    }
+
+    private int resolveRowContentWidth(View row) {
+        int rowWidth = row != null ? row.getWidth() : 0;
+        if (rowWidth <= 0 && this.keyboardPanel != null) {
+            rowWidth = this.keyboardPanel.getWidth();
+        }
+        if (rowWidth <= 0) {
+            rowWidth = this.getResources().getDisplayMetrics().widthPixels;
+        }
+        int horizontalPadding = row != null ? row.getPaddingLeft() + row.getPaddingRight() : 0;
+        return Math.max(0, rowWidth - horizontalPadding);
+    }
+
+    private void updateSplitSpaceKeys(boolean splitEnabled) {
+        if (this.keySpace == null) {
+            return;
+        }
+        this.setHorizontalWeight(this.keySpace, 1f);
+        if (this.keySpaceRight != null) {
+            this.setHorizontalWeight(this.keySpaceRight, splitEnabled ? 1f : 0f);
+            this.keySpaceRight.setVisibility(splitEnabled ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    private void setHorizontalWeight(View view, float weight) {
+        if (view == null) {
+            return;
+        }
+        ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+        if (!(layoutParams instanceof LinearLayout.LayoutParams)) {
+            return;
+        }
+        LinearLayout.LayoutParams linearLayoutParams = (LinearLayout.LayoutParams) layoutParams;
+        if (linearLayoutParams.width != 0 || linearLayoutParams.weight != weight) {
+            linearLayoutParams.width = 0;
+            linearLayoutParams.weight = weight;
+            view.setLayoutParams(linearLayoutParams);
+        }
+    }
+
     private void setViewHeight(View view, int heightPx) {
         if (view == null) {
             return;
@@ -602,6 +1052,21 @@ public class DirectWritingIME extends InputMethodService {
         int safeHeight = Math.max(0, heightPx);
         if (layoutParams.height != safeHeight) {
             layoutParams.height = safeHeight;
+            view.setLayoutParams(layoutParams);
+        }
+    }
+
+    private void setViewWidth(View view, int widthPx) {
+        if (view == null) {
+            return;
+        }
+        ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+        if (layoutParams == null) {
+            return;
+        }
+        int safeWidth = Math.max(0, widthPx);
+        if (layoutParams.width != safeWidth) {
+            layoutParams.width = safeWidth;
             view.setLayoutParams(layoutParams);
         }
     }
@@ -716,8 +1181,50 @@ public class DirectWritingIME extends InputMethodService {
         }
         int penThickness = ImePreferences.getPenThickness((Context)this);
         boolean pressureSensitive = ImePreferences.isPressureSensitivityEnabled((Context)this);
+        int penColor = this.normalizePaletteColor(ImePreferences.getPenColor((Context)this));
+        int eraserMode = ImePreferences.getEraserMode((Context)this);
+        int eraserSize = ImePreferences.getEraserSize((Context)this);
+
+        ImePreferences.setPenColor((Context)this, penColor);
+        ImePreferences.setEraserMode((Context)this, eraserMode);
+        ImePreferences.setEraserSize((Context)this, eraserSize);
+
+        this.canvasView.setStrokeColor(penColor);
         this.canvasView.setBaseStrokeWidth(penThickness);
         this.canvasView.setPressureSensitive(pressureSensitive);
+        this.canvasView.setEraserMode(this.toCanvasEraserMode(eraserMode));
+        this.canvasView.setEraserSizePx(eraserSize);
+        this.canvasView.setToolType(this.selectedHandwritingTool);
+
+        this.suppressHandwritingControlCallbacks = true;
+        try {
+            if (this.seekPenThickness != null) {
+                this.seekPenThickness.setProgress(penThickness - ImePreferences.MIN_PEN_THICKNESS);
+            }
+            if (this.tvPenThicknessValue != null) {
+                this.tvPenThicknessValue.setText(String.valueOf(penThickness));
+            }
+            if (this.switchPenPressure != null) {
+                this.switchPenPressure.setChecked(pressureSensitive);
+            }
+            if (this.groupEraserMode != null) {
+                this.groupEraserMode.check(
+                        eraserMode == ImePreferences.ERASER_MODE_AREA
+                                ? R.id.radio_eraser_area
+                                : R.id.radio_eraser_stroke
+                );
+            }
+            if (this.seekEraserSize != null) {
+                this.seekEraserSize.setProgress(eraserSize - ImePreferences.MIN_ERASER_SIZE);
+            }
+            if (this.tvEraserSizeValue != null) {
+                this.tvEraserSizeValue.setText(this.getString(R.string.handwriting_px_value, eraserSize));
+            }
+        } finally {
+            this.suppressHandwritingControlCallbacks = false;
+        }
+        this.updateColorChipSelection(penColor);
+        this.renderHandwritingToolsUi();
     }
 
     private void updateEnterKeyLabel(EditorInfo editorInfo) {

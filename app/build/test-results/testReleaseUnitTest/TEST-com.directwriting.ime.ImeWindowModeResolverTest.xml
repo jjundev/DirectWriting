@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.directwriting.ime.ImeWindowModeResolverTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-03-08T12:59:28.189Z" hostname="HYUNJUN-IDEAPAD" time="0.001">
+  <properties/>
+  <testcase name="shouldUseSplitLayout_sw600Portrait_returnsFalse" classname="com.directwriting.ime.ImeWindowModeResolverTest" time="0.0"/>
+  <testcase name="shouldUseSplitLayout_sw600Landscape_returnsTrue" classname="com.directwriting.ime.ImeWindowModeResolverTest" time="0.001"/>
+  <testcase name="shouldDisableExtractUi_sw599_returnsFalse" classname="com.directwriting.ime.ImeWindowModeResolverTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

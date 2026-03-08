@@ -1919,7 +1919,7 @@
     <string name="abc_shareactionprovider_share_with_application">Share with <ns2:g example="Mail" id="application_name">%s</ns2:g></string>
     <string name="abc_toolbar_collapse_description">Collapse</string>
     <string name="androidx_startup" translatable="false">androidx.startup</string>
-    <string name="app_name">DirectWriting</string>
+    <string name="app_name">Writable Keyboard</string>
     <string name="appbar_scrolling_view_behavior" translatable="false">com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior</string>
     <string name="bottom_sheet_behavior" translatable="false">com.google.android.material.bottomsheet.BottomSheetBehavior</string>
     <string description="A description of an accessibility action to collapse the bottom sheet [CHAR LIMIT=NONE]" name="bottomsheet_action_collapse">Collapse the bottom sheet</string>
@@ -1928,7 +1928,10 @@
     <string description="An accessibility feedback when the bottom sheet drag handle is clicked [CHAR LIMIT=NONE]" name="bottomsheet_drag_handle_clicked">Drag handle double-tapped</string>
     <string description="The content description of bottom sheet drag handles [CHAR LIMIT=NONE]" name="bottomsheet_drag_handle_content_description">Drag handle</string>
     <string name="btn_clear">지우기</string>
+    <string name="btn_eraser_tool">지우개</string>
     <string name="btn_mode_toggle">입력 모드 전환</string>
+    <string name="btn_pen_tool">펜</string>
+    <string name="btn_redo">다시하기</string>
     <string name="btn_send">전송</string>
     <string name="btn_undo">되돌리기</string>
     <string name="call_notification_answer_action">Answer</string>
@@ -1942,6 +1945,14 @@
     <string name="character_counter_overflowed_content_description">Character limit exceeded %1$d of %2$d</string>
     <string name="character_counter_pattern" translatable="false">%1$d/%2$d</string>
     <string name="clear_text_end_icon_content_description">Clear text</string>
+    <string name="color_black">검정</string>
+    <string name="color_blue">파랑</string>
+    <string name="color_indigo">남색</string>
+    <string name="color_orange">주황</string>
+    <string name="color_purple">보라</string>
+    <string name="color_red">빨강</string>
+    <string name="color_teal">청록</string>
+    <string name="color_yellow">노랑</string>
     <string description="Screen reader announcement for when a checkbox is on error. [CHAR LIMIT=NONE]" name="error_a11y_label">
     Error: invalid
   </string>
@@ -1949,6 +1960,16 @@
     <string name="exposed_dropdown_menu_content_description">Show dropdown menu</string>
     <string name="fab_transformation_scrim_behavior" translatable="false">com.google.android.material.transformation.FabTransformationScrimBehavior</string>
     <string name="fab_transformation_sheet_behavior" translatable="false">com.google.android.material.transformation.FabTransformationSheetBehavior</string>
+    <string name="handwriting_eraser_mode">모드</string>
+    <string name="handwriting_eraser_mode_area">영역 지우개</string>
+    <string name="handwriting_eraser_mode_stroke">획 지우개</string>
+    <string name="handwriting_eraser_settings">지우개 설정</string>
+    <string name="handwriting_eraser_size">크기</string>
+    <string name="handwriting_pen_color">색상</string>
+    <string name="handwriting_pen_settings">펜 설정</string>
+    <string name="handwriting_pen_thickness">두께</string>
+    <string name="handwriting_pressure_sensitivity">필압 감지</string>
+    <string name="handwriting_px_value">%1$dpx</string>
     <string name="hide_bottom_view_on_scroll_behavior" translatable="false">com.google.android.material.behavior.HideBottomViewOnScrollBehavior</string>
     <string description="Content description for an icon that appears in the title area of a dialog" name="icon_content_description">Dialog Icon</string>
     <string name="ime_name">DirectWriting 키보드</string>
@@ -2105,7 +2126,7 @@
     <string name="settings_select_desc">활성화 후 아래 버튼으로 DirectWriting을 기본 키보드로 선택하세요.</string>
     <string name="settings_select_keyboard">키보드 선택</string>
     <string name="settings_select_step">2단계: 키보드 선택</string>
-    <string name="settings_title">DirectWriting 설정</string>
+    <string name="settings_title">Writable Keyboard</string>
     <string description="Title of the side sheet&apos;s accessibility pane that is spoken by TalkBack when the side sheet appears on screen. [CHAR_LIMIT=NONE]" name="side_sheet_accessibility_pane_title">Side Sheet</string>
     <string name="side_sheet_behavior" translatable="false">com.google.android.material.sidesheet.SideSheetBehavior</string>
     <string name="status_bar_notification_info_overflow">999+</string>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">DirectWriting</string>
+    <string name="app_name">Writable Keyboard</string>
     <string name="ime_name">DirectWriting 키보드</string>
-    <string name="settings_title">DirectWriting 설정</string>
+    <string name="settings_title">Writable Keyboard</string>
     <string name="subtype_korean">한국어 키보드</string>
     <string name="subtype_english">English Keyboard</string>
 
@@ -35,6 +35,29 @@
     <string name="btn_send">전송</string>
     <string name="btn_clear">지우기</string>
     <string name="btn_undo">되돌리기</string>
+    <string name="btn_redo">다시하기</string>
+    <string name="btn_pen_tool">펜</string>
+    <string name="btn_eraser_tool">지우개</string>
+
+    <string name="handwriting_pen_settings">펜 설정</string>
+    <string name="handwriting_pen_thickness">두께</string>
+    <string name="handwriting_pressure_sensitivity">필압 감지</string>
+    <string name="handwriting_pen_color">색상</string>
+    <string name="handwriting_eraser_settings">지우개 설정</string>
+    <string name="handwriting_eraser_mode">모드</string>
+    <string name="handwriting_eraser_mode_stroke">획 지우개</string>
+    <string name="handwriting_eraser_mode_area">영역 지우개</string>
+    <string name="handwriting_eraser_size">크기</string>
+    <string name="handwriting_px_value">%1$dpx</string>
+
+    <string name="color_black">검정</string>
+    <string name="color_red">빨강</string>
+    <string name="color_orange">주황</string>
+    <string name="color_yellow">노랑</string>
+    <string name="color_teal">청록</string>
+    <string name="color_blue">파랑</string>
+    <string name="color_indigo">남색</string>
+    <string name="color_purple">보라</string>
 
     <string name="toast_empty_canvas">필기 내용이 없습니다.</string>
     <string name="toast_save_failed">이미지 저장에 실패했습니다.</string>

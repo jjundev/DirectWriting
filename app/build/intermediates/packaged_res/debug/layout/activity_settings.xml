@@ -148,7 +148,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:max="10"
+                        android:max="20"
                         android:progress="4"
                         android:progressTint="@color/primary"
                         android:thumbTint="@color/primary" />

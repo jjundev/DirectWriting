@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.directwriting.ime.KeyActionMapperTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-03-08T14:59:48.424Z" hostname="HYUNJUN-IDEAPAD" time="0.035">
+  <properties/>
+  <testcase name="mapById_btnRedo_mapsToRedoHandwritingAction" classname="com.directwriting.ime.KeyActionMapperTest" time="0.033"/>
+  <testcase name="mapById_keySpaceRight_mapsToSpaceAction" classname="com.directwriting.ime.KeyActionMapperTest" time="0.001"/>
+  <testcase name="mapById_btnEraserTool_mapsToEraserToolAction" classname="com.directwriting.ime.KeyActionMapperTest" time="0.0"/>
+  <testcase name="mapById_btnPenTool_mapsToPenToolAction" classname="com.directwriting.ime.KeyActionMapperTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

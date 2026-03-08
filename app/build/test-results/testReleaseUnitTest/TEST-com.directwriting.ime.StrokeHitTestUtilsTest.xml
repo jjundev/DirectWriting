@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.directwriting.ime.StrokeHitTestUtilsTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-03-08T12:59:28.207Z" hostname="HYUNJUN-IDEAPAD" time="0.001">
+  <properties/>
+  <testcase name="isPointNearSegment_diagonalSegment_boundaryIncluded" classname="com.directwriting.ime.StrokeHitTestUtilsTest" time="0.001"/>
+  <testcase name="isPointNearSegment_verticalSegment_outsideRadius" classname="com.directwriting.ime.StrokeHitTestUtilsTest" time="0.0"/>
+  <testcase name="isPointNearSegment_zeroLengthSegment_usesPointDistance" classname="com.directwriting.ime.StrokeHitTestUtilsTest" time="0.0"/>
+  <testcase name="isPointNearSegment_horizontalSegment_insideRadius" classname="com.directwriting.ime.StrokeHitTestUtilsTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

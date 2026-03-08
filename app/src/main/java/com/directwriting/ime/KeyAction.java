@@ -22,6 +22,9 @@ public final class KeyAction {
         SEND_HANDWRITING,
         CLEAR_HANDWRITING,
         UNDO_HANDWRITING,
+        REDO_HANDWRITING,
+        PEN_TOOL,
+        ERASER_TOOL,
         NONE
     }
 
