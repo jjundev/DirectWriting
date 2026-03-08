@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <fraction name="ime_keyboard_height_ratio_portrait">42%</fraction>
+    <fraction name="ime_keyboard_height_ratio_landscape">55%</fraction>
+</resources>

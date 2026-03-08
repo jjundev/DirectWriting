@@ -12,8 +12,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 /**
- * IME 설정 화면.
- * 앱 런처에서 접근 가능하며, 키보드 활성화 안내와 기본 설정을 제공합니다.
+ * IME settings screen available from launcher.
  */
 public class SettingsActivity extends AppCompatActivity {
 
@@ -22,14 +21,12 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        // 키보드 활성화 버튼
         Button btnEnableKeyboard = findViewById(R.id.btn_enable_keyboard);
         btnEnableKeyboard.setOnClickListener(v -> {
             Intent intent = new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS);
             startActivity(intent);
         });
 
-        // 키보드 선택 버튼
         Button btnSelectKeyboard = findViewById(R.id.btn_select_keyboard);
         btnSelectKeyboard.setOnClickListener(v -> {
             InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
@@ -38,16 +35,24 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        // 펜 두께 설정
         SeekBar seekBarThickness = findViewById(R.id.seekbar_thickness);
         TextView tvThicknessValue = findViewById(R.id.tv_thickness_value);
-        seekBarThickness.setProgress(4); // 기본값 4
-        tvThicknessValue.setText("4");
+
+        int savedThickness = clampThickness(ImePreferences.getPenThickness(this), seekBarThickness.getMax());
+        seekBarThickness.setProgress(savedThickness);
+        tvThicknessValue.setText(String.valueOf(savedThickness));
+
         seekBarThickness.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                int value = Math.max(1, progress);
+                int value = clampThickness(progress, seekBar.getMax());
+                if (progress != value) {
+                    seekBar.setProgress(value);
+                    return;
+                }
+
                 tvThicknessValue.setText(String.valueOf(value));
+                ImePreferences.setPenThickness(SettingsActivity.this, value);
             }
 
             @Override
@@ -59,8 +64,13 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        // 필압 감지 설정
         Switch switchPressure = findViewById(R.id.switch_pressure);
-        switchPressure.setChecked(true);
+        switchPressure.setChecked(ImePreferences.isPressureSensitivityEnabled(this));
+        switchPressure.setOnCheckedChangeListener((buttonView, isChecked) ->
+                ImePreferences.setPressureSensitivityEnabled(SettingsActivity.this, isChecked));
+    }
+
+    private int clampThickness(int value, int max) {
+        return Math.max(1, Math.min(value, max));
     }
 }

@@ -10,7 +10,6 @@
         android:orientation="vertical"
         android:padding="24dp">
 
-        <!-- 앱 제목 -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -23,12 +22,11 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="S펜 필기 키보드"
+            android:text="@string/settings_keyboard_subtitle"
             android:textSize="16sp"
             android:textColor="#757575"
             android:layout_marginBottom="32dp" />
 
-        <!-- 1. 키보드 활성화 카드 -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -45,7 +43,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="1단계: 키보드 활성화"
+                    android:text="@string/settings_enable_step"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:textColor="#212121"
@@ -63,13 +61,12 @@
                     android:id="@+id/btn_enable_keyboard"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:text="키보드 설정 열기"
+                    android:text="@string/settings_open_keyboard"
                     android:backgroundTint="@color/primary"
                     android:textColor="@android:color/white" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- 2. 키보드 선택 카드 -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -86,7 +83,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="2단계: 키보드 선택"
+                    android:text="@string/settings_select_step"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:textColor="#212121"
@@ -95,7 +92,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="활성화 후 아래 버튼으로 DirectWriting을 기본 키보드로 선택하세요."
+                    android:text="@string/settings_select_desc"
                     android:textSize="14sp"
                     android:textColor="#616161"
                     android:layout_marginBottom="16dp" />
@@ -104,13 +101,12 @@
                     android:id="@+id/btn_select_keyboard"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:text="키보드 선택"
+                    android:text="@string/settings_select_keyboard"
                     android:backgroundTint="@color/primary"
                     android:textColor="@android:color/white" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- 3. 설정 카드 -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -127,13 +123,12 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="펜 설정"
+                    android:text="@string/settings_pen_title"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:textColor="#212121"
                     android:layout_marginBottom="16dp" />
 
-                <!-- 펜 두께 -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -168,14 +163,12 @@
                         android:gravity="center" />
                 </LinearLayout>
 
-                <!-- 구분선 -->
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="#E0E0E0"
                     android:layout_marginBottom="16dp" />
 
-                <!-- 필압 감지 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

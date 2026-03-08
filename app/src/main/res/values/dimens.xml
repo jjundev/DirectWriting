@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="ime_keyboard_quickbar_base_height">38dp</dimen>
+    <dimen name="ime_keyboard_number_row_base_height">46dp</dimen>
+    <dimen name="ime_keyboard_row_base_height">50dp</dimen>
+    <dimen name="ime_keyboard_last_row_base_height">56dp</dimen>
+
+    <dimen name="ime_keyboard_fixed_extra_height">12dp</dimen>
+    <dimen name="ime_keyboard_min_height">300dp</dimen>
+    <dimen name="ime_keyboard_max_height">430dp</dimen>
+</resources>

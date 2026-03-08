@@ -1,20 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- 메인 테마 컬러 -->
-    <color name="primary">#3D5AFE</color>
-    <color name="primary_dark">#304FFE</color>
-    <color name="accent">#448AFF</color>
+    <color name="primary">#1B4FD6</color>
+    <color name="primary_dark">#153FAE</color>
+    <color name="accent">#2B68FF</color>
 
-    <!-- 키보드 배경 -->
-    <color name="keyboard_background">#F5F5F5</color>
-    <color name="toolbar_background">#EEEEEE</color>
+    <color name="keyboard_background">#E9EDF3</color>
+    <color name="toolbar_background">#DDE4EE</color>
+    <color name="toolbar_text">#2A3442</color>
+
+    <color name="toolbar_button_background">#F9FBFF</color>
+    <color name="toolbar_button_pressed">#D2DCEF</color>
+    <color name="toolbar_button_text">#273040</color>
+
+    <color name="quickbar_chip_background">#F3F5F9</color>
+    <color name="quickbar_chip_pressed">#E5EAF2</color>
+    <color name="quickbar_button_background">#F3F5F9</color>
+    <color name="quickbar_button_pressed">#E0E6F0</color>
+    <color name="quickbar_text">#2E3744</color>
+
+    <color name="key_background">#FFFFFF</color>
+    <color name="key_background_pressed">#E4EAF4</color>
+    <color name="key_special_background">#CED7E5</color>
+    <color name="key_special_background_pressed">#BFCADA</color>
+    <color name="key_enter_background">#1F5BEA</color>
+    <color name="key_enter_pressed">#1848BA</color>
+    <color name="key_border">#B8C2D4</color>
+    <color name="key_text">#1F2833</color>
+
     <color name="canvas_background">#FFFFFF</color>
+    <color name="icon_tint">#4A5668</color>
+    <color name="divider_color">#CBD3E1</color>
 
-    <!-- 아이콘/텍스트 -->
-    <color name="icon_tint">#616161</color>
-    <color name="divider_color">#E0E0E0</color>
-
-    <!-- 전송 버튼 -->
-    <color name="send_button">#3D5AFE</color>
-    <color name="send_button_pressed">#304FFE</color>
+    <color name="send_button">#1F5BEA</color>
+    <color name="send_button_pressed">#1848BA</color>
 </resources>
