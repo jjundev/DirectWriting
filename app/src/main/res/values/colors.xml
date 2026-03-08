@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 메인 테마 컬러 -->
+    <color name="primary">#3D5AFE</color>
+    <color name="primary_dark">#304FFE</color>
+    <color name="accent">#448AFF</color>
+
+    <!-- 키보드 배경 -->
+    <color name="keyboard_background">#F5F5F5</color>
+    <color name="toolbar_background">#EEEEEE</color>
+    <color name="canvas_background">#FFFFFF</color>
+
+    <!-- 아이콘/텍스트 -->
+    <color name="icon_tint">#616161</color>
+    <color name="divider_color">#E0E0E0</color>
+
+    <!-- 전송 버튼 -->
+    <color name="send_button">#3D5AFE</color>
+    <color name="send_button_pressed">#304FFE</color>
+</resources>

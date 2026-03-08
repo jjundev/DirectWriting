@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/keyboard_background">
+
+    <!-- 상단 툴바 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:background="@color/toolbar_background">
+
+        <!-- 되돌리기 버튼 -->
+        <ImageButton
+            android:id="@+id/btn_undo"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_undo"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/btn_undo"
+            android:tint="@color/icon_tint"
+            android:scaleType="centerInside"
+            android:padding="8dp" />
+
+        <!-- 지우기 버튼 -->
+        <ImageButton
+            android:id="@+id/btn_clear"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_clear"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/btn_clear"
+            android:tint="@color/icon_tint"
+            android:scaleType="centerInside"
+            android:padding="8dp"
+            android:layout_marginStart="8dp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- 키보드 전환 버튼 -->
+        <ImageButton
+            android:id="@+id/btn_keyboard"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_keyboard"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/btn_switch_keyboard"
+            android:tint="@color/icon_tint"
+            android:scaleType="centerInside"
+            android:padding="8dp" />
+    </LinearLayout>
+
+    <!-- 구분선 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_color" />
+
+    <!-- Canvas 필기 영역 -->
+    <com.directwriting.ime.CanvasView
+        android:id="@+id/canvas_view"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:background="@drawable/canvas_background" />
+
+    <!-- 구분선 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_color" />
+
+    <!-- 하단 전송 버튼 영역 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:background="@color/toolbar_background">
+
+        <!-- 전송 버튼 -->
+        <ImageButton
+            android:id="@+id/btn_send"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_send"
+            android:background="@drawable/btn_send_background"
+            android:contentDescription="@string/btn_send"
+            android:tint="@android:color/white"
+            android:scaleType="centerInside"
+            android:padding="12dp" />
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">DirectWriting</string>
+    <string name="ime_name">DirectWriting 필기 키보드</string>
+    <string name="settings_title">DirectWriting 설정</string>
+    <string name="subtype_handwriting">필기</string>
+
+    <!-- 버튼 -->
+    <string name="btn_send">전송</string>
+    <string name="btn_clear">지우기</string>
+    <string name="btn_undo">되돌리기</string>
+    <string name="btn_switch_keyboard">키보드 전환</string>
+
+    <!-- 토스트 메시지 -->
+    <string name="toast_empty_canvas">필기 내용이 없습니다.</string>
+    <string name="toast_save_failed">이미지 저장에 실패했습니다.</string>
+    <string name="toast_clipboard_copied">이미지가 클립보드에 복사되었습니다.\n붙여넣기(Ctrl+V)로 삽입하세요.</string>
+    <string name="toast_image_sent">이미지가 전송되었습니다.</string>
+
+    <!-- 설정 화면 -->
+    <string name="settings_enable_ime">키보드 활성화 방법</string>
+    <string name="settings_enable_ime_desc">설정 → 시스템 → 언어 및 입력 → 화상 키보드에서\n\"DirectWriting 필기 키보드\"를 활성화하세요.</string>
+    <string name="settings_pen_thickness">펜 두께</string>
+    <string name="settings_pressure_sensitivity">필압 감지</string>
+    <string name="settings_pressure_sensitivity_desc">S펜 필압에 따라 선 굵기를 자동 조절합니다.</string>
+</resources>
